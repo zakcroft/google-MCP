@@ -4,19 +4,19 @@ import os
 from dotenv import load_dotenv
 
 # MCP Server Imports
-from mcp import types as mcp_types # Use alias to avoid conflict
+from mcp import types as mcp_types  # Use alias to avoid conflict
 from mcp.server.lowlevel import Server, NotificationOptions
 from mcp.server.models import InitializationOptions
-import mcp.server.stdio # For running as a stdio server
+import mcp.server.stdio  # For running as a stdio server
 
 # ADK Tool Imports
 from google.adk.tools.function_tool import FunctionTool
-from google.adk.tools.load_web_page import load_web_page # Example ADK tool
+from google.adk.tools.load_web_page import load_web_page  # Example ADK tool
 # ADK <-> MCP Conversion Utility
 from google.adk.tools.mcp_tool.conversion_utils import adk_to_mcp_tool_type
 
 # --- Load Environment Variables (If ADK tools need them, e.g., API keys) ---
-load_dotenv() # Create a .env file in the same directory if needed
+load_dotenv()  # Create a .env file in the same directory if needed
 
 # --- Prepare the ADK Tool ---
 # Instantiate the ADK tool you want to expose.
@@ -31,6 +31,7 @@ print("Creating MCP Server instance...")
 # Create a named MCP Server instance using the mcp.server library
 app = Server("adk-tool-exposing-mcp-server")
 
+
 # Implement the MCP server's handler to list available tools
 @app.list_tools()
 async def list_mcp_tools() -> list[mcp_types.Tool]:
@@ -41,11 +42,12 @@ async def list_mcp_tools() -> list[mcp_types.Tool]:
     print(f"MCP Server: Advertising tool: {mcp_tool_schema.name}")
     return [mcp_tool_schema]
 
+
 # Implement the MCP server's handler to execute a tool call
 @app.call_tool()
 async def call_mcp_tool(
-    name: str, arguments: dict
-) -> list[mcp_types.TextContent]: # MCP uses mcp_types.Content
+        name: str, arguments: dict
+) -> list[mcp_types.TextContent]:  # MCP uses mcp_types.Content
     """MCP handler to execute a tool call requested by an MCP client."""
     print(f"MCP Server: Received call_tool request for '{name}' with args: {arguments}")
 
@@ -81,6 +83,7 @@ async def call_mcp_tool(
         error_text = json.dumps({"error": f"Tool '{name}' not implemented by this server."})
         return [mcp_types.TextContent(type="text", text=error_text)]
 
+
 # --- MCP Server Runner ---
 async def run_mcp_stdio_server():
     """Runs the MCP server, listening for connections over standard input/output."""
@@ -91,7 +94,7 @@ async def run_mcp_stdio_server():
             read_stream,
             write_stream,
             InitializationOptions(
-                server_name=app.name, # Use the server name defined above
+                server_name=app.name,  # Use the server name defined above
                 server_version="0.1.0",
                 capabilities=app.get_capabilities(
                     # Define server capabilities - consult MCP docs for options
@@ -101,6 +104,7 @@ async def run_mcp_stdio_server():
             ),
         )
         print("MCP Stdio Server: Run loop finished or client disconnected.")
+
 
 if __name__ == "__main__":
     print("Launching MCP Server to expose ADK tools via stdio...")
